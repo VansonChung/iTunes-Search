@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.van.itunessearch.ui.MainActivity">
+    <item
+        android:id="@+id/nav_music"
+        android:icon="@drawable/ic_baseline_music_note_24"
+        android:title="@string/tab_music" />
+    <item
+        android:id="@+id/nav_movie"
+        android:icon="@drawable/ic_baseline_movie_24"
+        android:title="@string/tab_movie" />
+</menu>
