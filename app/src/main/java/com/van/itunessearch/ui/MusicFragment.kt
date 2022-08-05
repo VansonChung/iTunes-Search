@@ -5,11 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import com.van.itunessearch.databinding.FragmentMusicBinding
 import timber.log.Timber
 
-class MusicFragment : Fragment() {
+class MusicFragment : TabFragment() {
 
     private var _binding: FragmentMusicBinding? = null
     private val binding get() = _binding!!
@@ -78,5 +77,9 @@ class MusicFragment : Fragment() {
     override fun onDetach() {
         Timber.d("onDetach")
         super.onDetach()
+    }
+
+    override fun onSearch(query: String) {
+        Timber.d("query : $query")
     }
 }

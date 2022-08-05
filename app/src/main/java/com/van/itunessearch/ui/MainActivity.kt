@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         // let MovieFragment preload
         viewPager2.offscreenPageLimit = 2
         viewPager2.adapter = viewPager2Adapter
-        viewPager2.registerOnPageChangeCallback(pageChangeCb)
+        viewPager2.registerOnPageChangeCallback(onPageChangeCallback)
 
         bottomNavigationView.setOnItemSelectedListener {
             when (it.itemId) {
@@ -48,10 +48,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        viewPager2.unregisterOnPageChangeCallback(pageChangeCb)
+        viewPager2.unregisterOnPageChangeCallback(onPageChangeCallback)
     }
 
-    private val pageChangeCb = object : ViewPager2.OnPageChangeCallback() {
+    private val onPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
             bottomNavigationView.menu.getItem(position).isChecked = true

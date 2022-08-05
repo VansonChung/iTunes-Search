@@ -5,11 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import com.van.itunessearch.databinding.FragmentMovieBinding
 import timber.log.Timber
 
-class MovieFragment : Fragment() {
+class MovieFragment : TabFragment() {
 
     private var _binding: FragmentMovieBinding? = null
     private val binding get() = _binding!!
@@ -78,5 +77,9 @@ class MovieFragment : Fragment() {
     override fun onDetach() {
         Timber.d("onDetach")
         super.onDetach()
+    }
+
+    override fun onSearch(query: String) {
+        Timber.d("query : $query")
     }
 }

@@ -2,5 +2,6 @@
     <string name="app_name">iTunes Search</string>
     <string name="tab_music">Music</string>
     <string name="tab_movie">Movie</string>
+    <string name="search">Search</string>
     <string name="player">Player</string>
 </resources>
