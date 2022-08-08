@@ -62,14 +62,16 @@ object RetrofitService {
 
 interface ITunesSearchApi {
 
+    // https://itunes.apple.com/search?media=music&term=michael
     @GET(ApiConfig.SEARCH_MUSIC)
-    suspend fun searchMusicByTerm(
-        @Query(value = "term", encoded = true) term: String
+    suspend fun searchMusic(
+        @Query(value = "term", encoded = true) input: String
     ): Response<MusicSearchResp>
 
+    // https://itunes.apple.com/search?media=movie&term=michael
     @GET(ApiConfig.SEARCH_MOVIE)
-    suspend fun searchMovieByTerm(
-        @Query(value = "term", encoded = true) term: String
+    suspend fun searchMovie(
+        @Query(value = "term", encoded = true) input: String
     ): Response<MovieSearchResp>
 
 }

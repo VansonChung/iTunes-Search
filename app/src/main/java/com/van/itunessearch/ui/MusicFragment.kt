@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.MenuHost
+import androidx.lifecycle.Lifecycle
 import com.van.itunessearch.databinding.FragmentMusicBinding
 import timber.log.Timber
 
@@ -30,12 +32,16 @@ class MusicFragment : TabFragment() {
     ): View {
         Timber.d("onCreateView")
         _binding = FragmentMusicBinding.inflate(inflater, container, false)
+        // TODO move to TabFragment
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Timber.d("onViewCreated")
         super.onViewCreated(view, savedInstanceState)
+        initView()
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -79,7 +85,9 @@ class MusicFragment : TabFragment() {
         super.onDetach()
     }
 
-    override fun onSearch(query: String) {
-        Timber.d("query : $query")
+    private fun initView() {
+        searchViewModel.musicInfo.observe(viewLifecycleOwner) {
+            Timber.d("musicInfo observe")
+        }
     }
 }

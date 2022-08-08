@@ -1,22 +1,22 @@
 package com.van.itunessearch.ui
 
-import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
+import android.view.MenuItem
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.van.itunessearch.R
+import com.van.itunessearch.viewmodel.SearchViewModel
+import com.van.itunessearch.viewmodel.SearchViewModelFactory
+import timber.log.Timber
 
-abstract class TabFragment : Fragment() {
+abstract class TabFragment : Fragment(), MenuProvider {
 
-    abstract fun onSearch(query: String)
+    protected val searchViewModel: SearchViewModel by activityViewModels { SearchViewModelFactory() }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, menuInflater: MenuInflater) {
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         if (isResumed) { // avoid two searchView ...
             menuInflater.inflate(R.menu.menu_options, menu)
             val searchItem = menu.findItem(R.id.search)
@@ -25,16 +25,23 @@ abstract class TabFragment : Fragment() {
         }
     }
 
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        return true
+    }
+
     private val onQueryTextListener = object : SearchView.OnQueryTextListener {
 
         override fun onQueryTextSubmit(query: String?): Boolean {
-            query?.let { onSearch(it) }
+            Timber.d("query : $query")
+            query?.let {
+                searchViewModel.searchMusic(query)
+                searchViewModel.searchMovie(query)
+            }
             return true
         }
 
         override fun onQueryTextChange(newText: String?): Boolean {
             return true
         }
-
     }
 }
