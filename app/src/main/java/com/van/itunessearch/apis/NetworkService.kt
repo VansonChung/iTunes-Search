@@ -12,13 +12,20 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 import java.util.concurrent.TimeUnit
 
+private const val BASE_URL = "https://itunes.apple.com/"
+
+private const val SEARCH_MUSIC = "/search?media=music"
+private const val SEARCH_MOVIE = "/search?media=movie"
+
+private const val OKHTTP_TIMEOUT = 15L
+
 object RetrofitService {
 
     // by lazy is better ?!
     private val okhttpClient by lazy {
         OkHttpClient()
             .newBuilder()
-            .connectTimeout(ApiConfig.OKHTTP_TIMEOUT, TimeUnit.SECONDS).also {
+            .connectTimeout(OKHTTP_TIMEOUT, TimeUnit.SECONDS).also {
                 if (BuildConfig.DEBUG) {
                     val logging = HttpLoggingInterceptor()
                     logging.level = HttpLoggingInterceptor.Level.BODY
@@ -31,7 +38,7 @@ object RetrofitService {
     // by lazy is better ?!
     private val retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl(ApiConfig.BASE_URL)
+            .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(okhttpClient)
             .build()
@@ -39,7 +46,7 @@ object RetrofitService {
 
 //    private val okhttpClient =
 //        OkHttpClient().newBuilder()
-//            .connectTimeout(ApiConfig.OKHTTP_TIMEOUT, TimeUnit.SECONDS)
+//            .connectTimeout(OKHTTP_TIMEOUT, TimeUnit.SECONDS)
 //            .also {
 //                if (BuildConfig.DEBUG) {
 //                    val logging = HttpLoggingInterceptor()
@@ -50,7 +57,7 @@ object RetrofitService {
 
 //    private fun retrofit() =
 //        Retrofit.Builder()
-//            .baseUrl(ApiConfig.BASE_URL)
+//            .baseUrl(BASE_URL)
 //            .addConverterFactory(GsonConverterFactory.create())
 //            .client(okhttpClient)
 //            .build()
@@ -63,13 +70,13 @@ object RetrofitService {
 interface ITunesSearchApi {
 
     // https://itunes.apple.com/search?media=music&term=michael
-    @GET(ApiConfig.SEARCH_MUSIC)
+    @GET(SEARCH_MUSIC)
     suspend fun searchMusic(
         @Query(value = "term", encoded = true) input: String
     ): Response<MusicSearchResp>
 
     // https://itunes.apple.com/search?media=movie&term=michael
-    @GET(ApiConfig.SEARCH_MOVIE)
+    @GET(SEARCH_MOVIE)
     suspend fun searchMovie(
         @Query(value = "term", encoded = true) input: String
     ): Response<MovieSearchResp>

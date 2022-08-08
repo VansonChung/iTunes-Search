@@ -10,7 +10,6 @@ import com.van.itunessearch.apis.resp.MusicInfo
 import com.van.itunessearch.safeLaunch
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -63,7 +62,6 @@ class SearchViewModel(private val repository: DataRepository) : ViewModel() {
                 _movieLoading.value = true
             }
             withContext(Dispatchers.IO) {
-                delay(5000)
                 val resp = repository.searchMovie(input)
                 if (resp.isSuccessful) {
                     withContext(Dispatchers.Main) {
