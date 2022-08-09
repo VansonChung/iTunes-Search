@@ -1,12 +1,12 @@
 package com.van.itunessearch
 
-import com.van.itunessearch.apis.RetrofitService
+import com.van.itunessearch.apis.ITunesApi
 
 object DataRepository {
 
     suspend fun searchMusic(input: String) =
-        RetrofitService.iTunesSearchApi.searchMusic(input)
+        ITunesApi.retrofitService.searchMusic(input)
 
     suspend fun searchMovie(input: String) =
-        RetrofitService.iTunesSearchApi.searchMovie(input)
+        ITunesApi.retrofitService.searchMovie(input)
 }
