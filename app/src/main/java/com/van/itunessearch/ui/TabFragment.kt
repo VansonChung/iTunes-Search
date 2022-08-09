@@ -13,10 +13,10 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
+import com.van.itunessearch.DataRepository
 import com.van.itunessearch.R
 import com.van.itunessearch.databinding.FragmentTabBinding
 import com.van.itunessearch.viewmodel.SearchViewModel
-import com.van.itunessearch.viewmodel.SearchViewModelFactory
 import timber.log.Timber
 
 open class TabFragment : Fragment(), MenuProvider {
@@ -26,7 +26,12 @@ open class TabFragment : Fragment(), MenuProvider {
 
     private lateinit var searchView: SearchView
 
-    protected val searchViewModel: SearchViewModel by activityViewModels { SearchViewModelFactory() }
+    // activityViewModels -> fragment sharing (viewModel)
+    protected val searchViewModel: SearchViewModel by activityViewModels {
+        SearchViewModel.Factory(
+            DataRepository
+        )
+    }
 
     private val progressDialogFragment by lazy {
         ProgressDialogFragment()

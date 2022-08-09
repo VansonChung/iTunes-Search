@@ -3,6 +3,7 @@ package com.van.itunessearch.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.van.itunessearch.DataRepository
 import com.van.itunessearch.apis.resp.MovieInfo
@@ -76,6 +77,16 @@ class SearchViewModel(private val repository: DataRepository) : ViewModel() {
                     }
                 }
             }
+        }
+    }
+
+    class Factory(private val repository: DataRepository) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(SearchViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return SearchViewModel(repository) as T
+            }
+            throw IllegalArgumentException("Unable to construct viewModel")
         }
     }
 }
