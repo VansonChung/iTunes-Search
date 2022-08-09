@@ -24,6 +24,8 @@ open class TabFragment : Fragment(), MenuProvider {
     private var _binding: FragmentTabBinding? = null
     protected val binding get() = _binding!!
 
+    private lateinit var searchView: SearchView
+
     protected val searchViewModel: SearchViewModel by activityViewModels { SearchViewModelFactory() }
 
     private val progressDialogFragment by lazy {
@@ -46,7 +48,7 @@ open class TabFragment : Fragment(), MenuProvider {
         if (isResumed) { // avoid two SearchView ...
             menuInflater.inflate(R.menu.menu_options, menu)
             val searchItem = menu.findItem(R.id.search)
-            val searchView = searchItem.actionView as SearchView
+            searchView = searchItem.actionView as SearchView
             searchView.setOnQueryTextListener(onQueryTextListener)
         }
     }
@@ -74,6 +76,7 @@ open class TabFragment : Fragment(), MenuProvider {
         override fun onQueryTextSubmit(query: String?): Boolean {
             Timber.d("query : $query")
             query?.let {
+                searchView.clearFocus()
                 searchViewModel.searchMusic(query)
                 searchViewModel.searchMovie(query)
             }

@@ -4,7 +4,7 @@ import android.app.Application
 import com.van.itunessearch.log.MultiTagTree
 import timber.log.Timber
 
-class MainApplication : Application() {
+class App : Application() {
 
     override fun onCreate() {
         super.onCreate()

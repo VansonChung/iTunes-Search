@@ -32,7 +32,6 @@ class MusicFragment : TabFragment() {
         Timber.d("onViewCreated")
         super.onViewCreated(view, savedInstanceState)
         initView()
-        binding.bt.text = "music"
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -48,7 +47,8 @@ class MusicFragment : TabFragment() {
     override fun onResume() {
         Timber.d("onResume")
         super.onResume()
-        searchViewModel.musicLoading.value?.let { showProgressDialogFragment(it) }
+        // use "fake loading view" to workaround ViewPager2 can't slid when loading(1/2)
+//        searchViewModel.musicLoading.value?.let { showProgressDialogFragment(it) }
     }
 
     override fun onPause() {
@@ -82,7 +82,13 @@ class MusicFragment : TabFragment() {
         }
         searchViewModel.musicLoading.observe(viewLifecycleOwner) {
             Timber.d("musicLoading observe : $it, isResumed : $isResumed")
-            if (isResumed) showProgressDialogFragment(it)
+            // use "fake loading view" to workaround ViewPager2 can't slid when loading(2/2)
+//            if (isResumed) showProgressDialogFragment(it)
+            if (it) {
+                binding.loading.visibility = View.VISIBLE
+            } else {
+                binding.loading.visibility = View.GONE
+            }
         }
     }
 }

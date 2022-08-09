@@ -10,6 +10,7 @@ import com.van.itunessearch.apis.resp.MusicInfo
 import com.van.itunessearch.safeLaunch
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -31,14 +32,18 @@ class SearchViewModel(private val repository: DataRepository) : ViewModel() {
     val movieLoading: LiveData<Boolean> get() = _movieLoading
     // Movie End ----------------------------------------
 
+    private var jobMusic: Job? = null
+    private var jobMovie: Job? = null
+
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        Timber.d("Exception handled: ${throwable.localizedMessage}")
+        Timber.e("Exception handled: ${throwable.localizedMessage}")
         // dismiss pb and show error msg
     }
 
     fun searchMusic(input: String) {
         Timber.d("searchMusic")
-        viewModelScope.safeLaunch(exceptionHandler) {
+        jobMusic?.cancel()
+        jobMusic = viewModelScope.safeLaunch(exceptionHandler) {
             withContext(Dispatchers.Main) {
                 _musicLoading.value = true
             }
@@ -57,7 +62,8 @@ class SearchViewModel(private val repository: DataRepository) : ViewModel() {
 
     fun searchMovie(input: String) {
         Timber.d("searchMovie")
-        viewModelScope.safeLaunch(exceptionHandler) {
+        jobMovie?.cancel()
+        jobMovie = viewModelScope.safeLaunch(exceptionHandler) {
             withContext(Dispatchers.Main) {
                 _movieLoading.value = true
             }
