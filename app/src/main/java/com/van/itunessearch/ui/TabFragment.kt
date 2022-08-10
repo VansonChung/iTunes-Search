@@ -16,6 +16,7 @@ import androidx.lifecycle.Lifecycle
 import com.van.itunessearch.DataRepository
 import com.van.itunessearch.R
 import com.van.itunessearch.databinding.FragmentTabBinding
+import com.van.itunessearch.ui.adapter.MediaAdapter
 import com.van.itunessearch.viewmodel.SearchViewModel
 import timber.log.Timber
 
@@ -44,6 +45,7 @@ open class TabFragment : Fragment(), MenuProvider {
     ): View {
         Timber.d("onCreateView")
         _binding = FragmentTabBinding.inflate(inflater, container, false)
+        binding.recyclerView.adapter = MediaAdapter()
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
         return binding.root

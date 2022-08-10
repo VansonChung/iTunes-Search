@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.van.itunessearch.ui.adapter.MediaAdapter
 import timber.log.Timber
 
 class MovieFragment : TabFragment() {
@@ -79,12 +80,17 @@ class MovieFragment : TabFragment() {
     private fun initView() {
         searchViewModel.movieInfo.observe(viewLifecycleOwner) {
             Timber.d("movieInfo observe")
+            val adapter = binding.recyclerView.adapter as MediaAdapter
+            adapter.submitList(it)
+            binding.recyclerView.visibility = View.VISIBLE
         }
         searchViewModel.movieLoading.observe(viewLifecycleOwner) {
             Timber.d("movieLoading observe : $it, isResumed : $isResumed")
             // use "fake loading view" to workaround ViewPager2 can't slid when loading(2/2)
 //            if (isResumed) showProgressDialogFragment(it)
             if (it) {
+                val adapter = binding.recyclerView.adapter as MediaAdapter
+                adapter.submitList(null)
                 binding.loading.visibility = View.VISIBLE
             } else {
                 binding.loading.visibility = View.GONE

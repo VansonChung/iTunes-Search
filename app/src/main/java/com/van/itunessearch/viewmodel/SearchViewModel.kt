@@ -18,16 +18,16 @@ import timber.log.Timber
 class SearchViewModel(private val repository: DataRepository) : ViewModel() {
 
     // Music --------------------------------------------
-    private var _musicInfo = MutableLiveData<List<MusicInfo>>()
-    val musicInfo: LiveData<List<MusicInfo>> get() = _musicInfo
+    private var _musicInfo = MutableLiveData<List<MediaInfo>>()
+    val musicInfo: LiveData<List<MediaInfo>> get() = _musicInfo
 
     private var _musicLoading = MutableLiveData<Boolean>()
     val musicLoading: LiveData<Boolean> get() = _musicLoading
     // Music End ----------------------------------------
 
     // Movie --------------------------------------------
-    private var _movieInfo = MutableLiveData<List<MovieInfo>>()
-    val movieInfo: LiveData<List<MovieInfo>> get() = _movieInfo
+    private var _movieInfo = MutableLiveData<List<MediaInfo>>()
+    val movieInfo: LiveData<List<MediaInfo>> get() = _movieInfo
 
     private var _movieLoading = MutableLiveData<Boolean>()
     val movieLoading: LiveData<Boolean> get() = _movieLoading
@@ -41,6 +41,13 @@ class SearchViewModel(private val repository: DataRepository) : ViewModel() {
         // dismiss pb and show error msg
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        Timber.d("onCleared")
+        jobMusic?.cancel()
+        jobMovie?.cancel()
+    }
+
     fun searchMusic(input: String) {
         Timber.d("searchMusic")
         jobMusic?.cancel()
@@ -52,7 +59,7 @@ class SearchViewModel(private val repository: DataRepository) : ViewModel() {
                 val resp = repository.searchMusic(input)
                 if (resp.isSuccessful) {
                     withContext(Dispatchers.Main) {
-                        _musicInfo.value = resp.body()?.results
+                        _musicInfo.value = transferMusic(resp.body()?.results)
                         _musicLoading.value = false
                     }
                 }
@@ -72,12 +79,40 @@ class SearchViewModel(private val repository: DataRepository) : ViewModel() {
                 val resp = repository.searchMovie(input)
                 if (resp.isSuccessful) {
                     withContext(Dispatchers.Main) {
-                        _movieInfo.value = resp.body()?.results
+                        _movieInfo.value = transferMovie(resp.body()?.results)
                         _movieLoading.value = false
                     }
                 }
             }
         }
+    }
+
+    private fun transferMusic(musicInfos: List<MusicInfo>?): List<MediaInfo> {
+        val result = ArrayList<MediaInfo>()
+        musicInfos?.forEach {
+            val imgUrl: String = when {
+                it.artworkUrl100.isNotEmpty() -> it.artworkUrl100
+                it.artworkUrl60.isNotEmpty() -> it.artworkUrl60
+                it.artworkUrl30.isNotEmpty() -> it.artworkUrl30
+                else -> ""
+            }
+            result.add(MediaInfo(imgUrl, it.artistName, it.trackName))
+        }
+        return result
+    }
+
+    private fun transferMovie(movieInfos: List<MovieInfo>?): List<MediaInfo> {
+        val result = ArrayList<MediaInfo>()
+        movieInfos?.forEach {
+            val imgUrl: String = when {
+                it.artworkUrl100.isNotEmpty() -> it.artworkUrl100
+                it.artworkUrl60.isNotEmpty() -> it.artworkUrl60
+                it.artworkUrl30.isNotEmpty() -> it.artworkUrl30
+                else -> ""
+            }
+            result.add(MediaInfo(imgUrl, it.artistName, it.trackName))
+        }
+        return result
     }
 
     class Factory(private val repository: DataRepository) : ViewModelProvider.Factory {
