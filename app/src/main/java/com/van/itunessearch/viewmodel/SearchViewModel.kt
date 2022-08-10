@@ -15,30 +15,43 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
+sealed class ApiStatus {
+    object Loading : ApiStatus()
+    class Error(var msg: String) : ApiStatus()
+    object Done : ApiStatus()
+}
+
 class SearchViewModel(private val repository: DataRepository) : ViewModel() {
 
     // Music --------------------------------------------
     private var _musicInfo = MutableLiveData<List<MediaInfo>>()
     val musicInfo: LiveData<List<MediaInfo>> get() = _musicInfo
 
-    private var _musicLoading = MutableLiveData<Boolean>()
-    val musicLoading: LiveData<Boolean> get() = _musicLoading
+    private var _musicStatus = MutableLiveData<ApiStatus>()
+    val musicStatus: LiveData<ApiStatus> get() = _musicStatus
     // Music End ----------------------------------------
 
     // Movie --------------------------------------------
     private var _movieInfo = MutableLiveData<List<MediaInfo>>()
     val movieInfo: LiveData<List<MediaInfo>> get() = _movieInfo
 
-    private var _movieLoading = MutableLiveData<Boolean>()
-    val movieLoading: LiveData<Boolean> get() = _movieLoading
+    private var _movieStatus = MutableLiveData<ApiStatus>()
+    val movieStatus: LiveData<ApiStatus> get() = _movieStatus
     // Movie End ----------------------------------------
 
     private var jobMusic: Job? = null
     private var jobMovie: Job? = null
 
-    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        Timber.e("Exception handled: ${throwable.localizedMessage}")
-        // dismiss pb and show error msg
+    private val musicExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        Timber.e("Music Exception handler : ${throwable.localizedMessage}")
+        _musicStatus.value =
+            ApiStatus.Error("Music Exception : ${throwable.localizedMessage}")
+    }
+
+    private val movieExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        Timber.e("Movie Exception handler : ${throwable.localizedMessage}")
+        _movieStatus.value =
+            ApiStatus.Error("Music Exception : ${throwable.localizedMessage}")
     }
 
     override fun onCleared() {
@@ -51,36 +64,45 @@ class SearchViewModel(private val repository: DataRepository) : ViewModel() {
     fun searchMusic(input: String) {
         Timber.d("searchMusic")
         jobMusic?.cancel()
-        jobMusic = viewModelScope.safeLaunch(exceptionHandler) {
+        jobMusic = viewModelScope.safeLaunch(musicExceptionHandler) {
             withContext(Dispatchers.Main) {
-                _musicLoading.value = true
+                _musicStatus.value = ApiStatus.Loading
             }
             withContext(Dispatchers.IO) {
                 val resp = repository.searchMusic(input)
                 if (resp.isSuccessful) {
+                    val info = transferMusic(resp.body()?.results)
                     withContext(Dispatchers.Main) {
-                        _musicInfo.value = transferMusic(resp.body()?.results)
-                        _musicLoading.value = false
+                        _musicInfo.value = info
+                        _musicStatus.value = ApiStatus.Done
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        _musicStatus.value = ApiStatus.Error("Error : ${resp.message()}")
                     }
                 }
             }
-
         }
     }
 
     fun searchMovie(input: String) {
         Timber.d("searchMovie")
         jobMovie?.cancel()
-        jobMovie = viewModelScope.safeLaunch(exceptionHandler) {
+        jobMovie = viewModelScope.safeLaunch(movieExceptionHandler) {
             withContext(Dispatchers.Main) {
-                _movieLoading.value = true
+                _movieStatus.value = ApiStatus.Loading
             }
             withContext(Dispatchers.IO) {
                 val resp = repository.searchMovie(input)
                 if (resp.isSuccessful) {
+                    val info = transferMovie(resp.body()?.results)
                     withContext(Dispatchers.Main) {
-                        _movieInfo.value = transferMovie(resp.body()?.results)
-                        _movieLoading.value = false
+                        _movieInfo.value = info
+                        _movieStatus.value = ApiStatus.Done
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        _movieStatus.value = ApiStatus.Error("Error : ${resp.message()}")
                     }
                 }
             }

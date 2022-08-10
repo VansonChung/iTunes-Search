@@ -80,21 +80,13 @@ class MovieFragment : TabFragment() {
     private fun initView() {
         searchViewModel.movieInfo.observe(viewLifecycleOwner) {
             Timber.d("movieInfo observe")
-            val adapter = binding.recyclerView.adapter as MediaAdapter
-            adapter.submitList(it)
-            binding.recyclerView.visibility = View.VISIBLE
+            submitAdapterData(it)
         }
-        searchViewModel.movieLoading.observe(viewLifecycleOwner) {
+        searchViewModel.movieStatus.observe(viewLifecycleOwner) {
             Timber.d("movieLoading observe : $it, isResumed : $isResumed")
             // use "fake loading view" to workaround ViewPager2 can't slid when loading(2/2)
 //            if (isResumed) showProgressDialogFragment(it)
-            if (it) {
-                val adapter = binding.recyclerView.adapter as MediaAdapter
-                adapter.submitList(null)
-                binding.loading.visibility = View.VISIBLE
-            } else {
-                binding.loading.visibility = View.GONE
-            }
+            apiStatusHandle(it)
         }
     }
 }

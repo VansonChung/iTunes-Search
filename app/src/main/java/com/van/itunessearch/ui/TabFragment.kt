@@ -17,13 +17,15 @@ import com.van.itunessearch.DataRepository
 import com.van.itunessearch.R
 import com.van.itunessearch.databinding.FragmentTabBinding
 import com.van.itunessearch.ui.adapter.MediaAdapter
+import com.van.itunessearch.viewmodel.ApiStatus
+import com.van.itunessearch.viewmodel.MediaInfo
 import com.van.itunessearch.viewmodel.SearchViewModel
 import timber.log.Timber
 
 open class TabFragment : Fragment(), MenuProvider {
 
     private var _binding: FragmentTabBinding? = null
-    protected val binding get() = _binding!!
+    private val binding get() = _binding!!
 
     private lateinit var searchView: SearchView
 
@@ -68,6 +70,33 @@ open class TabFragment : Fragment(), MenuProvider {
         Timber.d("onDestroyView")
         super.onDestroyView()
         _binding = null
+    }
+
+    protected fun apiStatusHandle(status: ApiStatus) {
+        when (status) {
+            ApiStatus.Loading -> {
+                val adapter = binding.recyclerView.adapter as MediaAdapter
+                adapter.submitList(null)
+                binding.textView.visibility = View.GONE
+                binding.loading.visibility = View.VISIBLE
+            }
+            is ApiStatus.Error -> {
+                binding.loading.visibility = View.GONE
+                binding.textView.visibility = View.VISIBLE
+                binding.textView.text = status.msg
+            }
+            ApiStatus.Done -> {
+                binding.textView.visibility = View.GONE
+                binding.loading.visibility = View.GONE
+            }
+            else -> {}
+        }
+    }
+
+    protected fun submitAdapterData(data: List<MediaInfo>) {
+        val adapter = binding.recyclerView.adapter as MediaAdapter
+        adapter.submitList(data)
+        binding.recyclerView.visibility = View.VISIBLE
     }
 
     protected fun showProgressDialogFragment(show: Boolean) {
